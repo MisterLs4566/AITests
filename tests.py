@@ -25,7 +25,9 @@ issue_hash_map = {}
 cursor.execute("CREATE TABLE IF NOT EXISTS issue(issue_id, issue_title, issue_description)")
 cursor.execute("""INSERT INTO issue VALUES
         (0, "IMPORTANT PROBLEM", "Die Kunden warten auf ihre Bestellung, aber nichts geht! Das System spinnt und lädt die ganze Zeit nicht!"),
-        (1, "ALSO AN IMPORTANT PROBLEM", "Es gibt Probleme beim Drucken der Lieferscheine. Es funktioniert zwar, aber es ist so langsam, dass man von einem Problem sprechen kann")""")
+        (1, "ALSO AN IMPORTANT PROBLEM", "Katzen können sprechen"),
+        (1, "ALSO AN IMPORTANT PROBLEM", "Es gibt Probleme beim Drucken der Lieferscheine. Es funktioniert zwar, aber es ist so langsam, dass man von einem Problem sprechen kann")       
+        """)
 
 for issue in issues:
         score_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
@@ -58,7 +60,7 @@ deg = (np.arccos(cos_sim)/np.pi) * 180
 if(deg > 50):
         print("Es konnte leider keine semantische Ähnlichkeit hergestellt werden")
         sys.exit()
-similar = [0, 1]
+similar = list(vectors_hash_map.keys())
 
 """Milestone 3"""
 # Brauche ich hierfür in irgendeiner Form RAG?
