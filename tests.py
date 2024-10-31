@@ -27,8 +27,8 @@ cursor.execute("""INSERT INTO issue VALUES
         """)
 
 for issue in issues:
-        score_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
-        issue_hash_map[issue] = score_projection.fetchone()[0]
+        description_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
+        issue_hash_map[issue] = description_projection.fetchone()[0]
         
 """Milestone 2"""
 
