@@ -22,7 +22,7 @@ issue_hash_map = {}
 cursor.execute("CREATE TABLE IF NOT EXISTS issue(issue_id, issue_title, issue_description)")
 cursor.execute("""INSERT INTO issue VALUES
         (0, "IMPORTANT PROBLEM", "Die Kunden warten auf ihre Bestellung, aber nichts geht! Das System spinnt und lädt die ganze Zeit nicht!"),
-        (1, "ALSO AN IMPORTANT PROBLEM", "Katzen können sprechen"),
+        (1, "ALSO AN IMPORTANT PROBLEM", "Ein weiteres Problem"),
         (1, "ALSO AN IMPORTANT PROBLEM", "Es gibt Probleme beim Drucken der Lieferscheine. Es funktioniert zwar, aber es ist so langsam, dass man von einem Problem sprechen kann")       
         """)
 
