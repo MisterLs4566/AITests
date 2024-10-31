@@ -12,9 +12,6 @@ os.environ['GOOGLE_API_KEY'] = 'AIzaSyAAOnjsaZQfadHQ896oFaMuHbfHBTc0TXw'
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# prompt = "Content for Gemini"
-# response = model.generate_content(prompt).text
-
 connection = sqlite3.connect("db/AITests-service.db")
 
 cursor = connection.cursor()
@@ -32,11 +29,7 @@ cursor.execute("""INSERT INTO issue VALUES
 for issue in issues:
         score_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
         issue_hash_map[issue] = score_projection.fetchone()[0]
-
-#print(issue_hash_map)
-
-#print(score_projection.fetchall()) #fetchall != fetchone
-
+        
 """Milestone 2"""
 
 vectors_hash_map = issue_hash_map.copy()
@@ -56,14 +49,14 @@ vector_b = vectors_hash_map[1]
 
 cos_sim = dot(vector_a, vector_b) / (norm(vector_a) * norm(vector_b))
 deg = (np.arccos(cos_sim)/np.pi) * 180
-# Wie soll das aussehen?
+
 if(deg > 50):
         print("Es konnte leider keine semantische Ähnlichkeit hergestellt werden")
         sys.exit()
 similar = list(vectors_hash_map.keys())
 
 """Milestone 3"""
-# Brauche ich hierfür in irgendeiner Form RAG?
+
 prompt_beginning = "Finde Gemeinsamkeiten in diesen Problemen. Erstelle einen prägnanten Titel, der beide Probleme zusammenfasst und gib eine kurze Beschreibung des übergeordneten Problems an, ohne dabei zu konkret zu werden."
 prompt_ending = ""
 for key in similar:
