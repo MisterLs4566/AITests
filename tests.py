@@ -77,14 +77,31 @@ prompt = ""
 #print(len(similarity))
 #print(similarity)
 
+#sort dictionarys by keys
+x = 0
+for group in similarity:
+        similarity[x] = dict(sorted(group.items()))
+        x+=1
+# delete similar groups:
+for x in range(0, len(similarity)):
+        for y in range(0, len(similarity)):
+                if(similarity[x] == similarity[y] and x!=y):
+                        similarity[x] = {0:"gleiche Gruppe: "+str(x)}
+
+#print(similarity)
+
 prompt_beginning = "Gib mir einen einzigen zusammenfassenden Titel aus, der für diese Probleme passt. Nicht mehr als einen Titel!"
 
+
 for group in similarity:
-        for key in group:
-                prompt_ending = prompt_ending + str(group[key]) + ", "
-                prompt = prompt + prompt_beginning + prompt_ending
-        response = model.generate_content(prompt).text
-        result.append(response)
-        prompt_ending = ""
-        prompt = ""
+        if(len(group)>1):
+                for key in group:
+                        prompt_ending = prompt_ending + str(group[key]) + ", "
+                        prompt = prompt + prompt_beginning + prompt_ending
+                response = "Titel: " + model.generate_content(prompt).text + " -> "+str(group)
+                result.append(response)
+                prompt_ending = ""
+                prompt = ""
+
 print(result)
+ 
