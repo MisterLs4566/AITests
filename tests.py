@@ -12,18 +12,18 @@ os.environ['GOOGLE_API_KEY'] = 'AIzaSyAAOnjsaZQfadHQ896oFaMuHbfHBTc0TXw'
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-connection = sqlite3.connect("db/AITests-service.db")
+connection = sqlite3.connect("C:\\Users\\asolo\\OneDrive\\Dokumente\\Linus\\AITests\\db\AITests-service.db")
 
 cursor = connection.cursor()
 
-issues = [0, 1]
+issues = [0, 1, 2]
 issue_hash_map = {}
 
 cursor.execute("CREATE TABLE IF NOT EXISTS issue(issue_id, issue_title, issue_description)")
 cursor.execute("""INSERT INTO issue VALUES
-        (0, "IMPORTANT PROBLEM", "Die Kunden warten auf ihre Bestellung, aber nichts geht! Das System spinnt und lädt die ganze Zeit nicht!"),
-        (1, "ALSO AN IMPORTANT PROBLEM", "Ein weiteres Problem"),
-        (1, "ALSO AN IMPORTANT PROBLEM", "Es gibt Probleme beim Drucken der Lieferscheine. Es funktioniert zwar, aber es ist so langsam, dass man von einem Problem sprechen kann")       
+        (0, "IMPORTANT PROBLEM", "Lieferscheine werden durch defektes Ticketing System nicht gedruckt"),
+        (1, "Probleme", "Katzen essen Hunde"),
+        (2, "ALSO AN IMPORTANT PROBLEM", "Scheine werden durch defektes Ticketing System nicht gedruckt")       
         """)
 
 for issue in issues:
@@ -44,23 +44,47 @@ for issue_text in list(issue_hash_map.values()):
         vector = np.array(result["embedding"])
         vectors_hash_map[issue_key] = vector
 
-vector_a = vectors_hash_map[0]
-vector_b = vectors_hash_map[1]
+#print(len(vectors_hash_map))
 
-cos_sim = dot(vector_a, vector_b) / (norm(vector_a) * norm(vector_b))
-deg = (np.arccos(cos_sim)/np.pi) * 180
-
-if(deg > 50):
-        print("Es konnte leider keine semantische Ähnlichkeit hergestellt werden")
-        sys.exit()
-similar = list(vectors_hash_map.keys())
+# Matrixvergleich
+similarity = []
+for x in range(0, len(list(vectors_hash_map.values()))):
+        for y in range(0, len(list(vectors_hash_map.values()))):
+                #print(list(vectors_hash_map.keys())[x])
+                vector_a = list(vectors_hash_map.values())[x]
+                #print(list(vectors_hash_map.keys())[y])
+                vector_b = list(vectors_hash_map.values())[y]
+                #print(vector_b)
+                cos_sim = round(dot(vector_a, vector_b) / (norm(vector_a) * norm(vector_b)), 9)
+                #print(cos_sim)
+                deg = (np.arccos(cos_sim)/np.pi) * 180
+                #print(deg)
+                if(y==0):
+                        #print(list(issue_hash_map.keys())[x])
+                        #print(list(issue_hash_map.values())[x])
+                        similarity.append({list(issue_hash_map.keys())[x] : list(issue_hash_map.values())[x]})
+                if(deg < 25):
+                        #print(list(issue_hash_map.keys())[y])
+                        #print("Hallo " + list(issue_hash_map.values())[y])
+                        similarity[x][list(issue_hash_map.keys())[y]] = list(issue_hash_map.values())[y]
 
 """Milestone 3"""
 
-prompt_beginning = "Finde Gemeinsamkeiten in diesen Problemen. Erstelle einen prägnanten Titel, der beide Probleme zusammenfasst und gib eine kurze Beschreibung des übergeordneten Problems an, ohne dabei zu konkret zu werden."
+result = []
 prompt_ending = ""
-for key in similar:
-        prompt_ending += issue_hash_map[key]
-prompt = prompt_beginning + prompt_ending
-response = model.generate_content(prompt).text
-print(response)
+prompt = ""
+#print(similarity)
+#print(len(similarity))
+#print(similarity)
+
+prompt_beginning = "Gib mir einen einzigen zusammenfassenden Titel aus, der für diese Probleme passt. Nicht mehr als einen Titel!"
+
+for group in similarity:
+        for key in group:
+                prompt_ending = prompt_ending + str(group[key]) + ", "
+                prompt = prompt + prompt_beginning + prompt_ending
+        response = model.generate_content(prompt).text
+        result.append(response)
+        prompt_ending = ""
+        prompt = ""
+print(result)
