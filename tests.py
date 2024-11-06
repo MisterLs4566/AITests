@@ -64,7 +64,7 @@ for x in range(0, len(similarity)):
         for y in range(0, len(similarity)):
                 if(similarity[x] == similarity[y] and x!=y):
                         similarity[x] = {0:"gleiche Gruppe: "+str(x)}
-prompt_beginning = "Please provide a summary title and a detailed description that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length."
+prompt_beginning = "Please provide a summary title and a detailed description that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length: "
 
 for group in similarity:
         if(len(group)>1):
