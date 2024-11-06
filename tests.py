@@ -6,8 +6,6 @@ from numpy.linalg import norm
 from numpy import dot
 import sys
 
-"""Milestone 1"""
-
 os.environ['GOOGLE_API_KEY'] = 'AIzaSyAAOnjsaZQfadHQ896oFaMuHbfHBTc0TXw'
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -29,8 +27,6 @@ cursor.execute("""INSERT INTO issue VALUES
 for issue in issues:
         description_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
         issue_hash_map[issue] = description_projection.fetchone()[0]
-        
-"""Milestone 2"""
 
 vectors_hash_map = issue_hash_map.copy()
 
@@ -44,54 +40,31 @@ for issue_text in list(issue_hash_map.values()):
         vector = np.array(result["embedding"])
         vectors_hash_map[issue_key] = vector
 
-#print(len(vectors_hash_map))
-
 # Matrixvergleich
 similarity = []
 for x in range(0, len(list(vectors_hash_map.values()))):
         for y in range(0, len(list(vectors_hash_map.values()))):
-                #print(list(vectors_hash_map.keys())[x])
                 vector_a = list(vectors_hash_map.values())[x]
-                #print(list(vectors_hash_map.keys())[y])
                 vector_b = list(vectors_hash_map.values())[y]
-                #print(vector_b)
                 cos_sim = round(dot(vector_a, vector_b) / (norm(vector_a) * norm(vector_b)), 9)
-                #print(cos_sim)
                 deg = (np.arccos(cos_sim)/np.pi) * 180
-                #print(deg)
                 if(y==0):
-                        #print(list(issue_hash_map.keys())[x])
-                        #print(list(issue_hash_map.values())[x])
                         similarity.append({list(issue_hash_map.keys())[x] : list(issue_hash_map.values())[x]})
                 if(deg < 25):
-                        #print(list(issue_hash_map.keys())[y])
-                        #print("Hallo " + list(issue_hash_map.values())[y])
                         similarity[x][list(issue_hash_map.keys())[y]] = list(issue_hash_map.values())[y]
-
-"""Milestone 3"""
 
 result = []
 prompt_ending = ""
 prompt = ""
-#print(similarity)
-#print(len(similarity))
-#print(similarity)
-
-#sort dictionarys by keys
 x = 0
 for group in similarity:
         similarity[x] = dict(sorted(group.items()))
         x+=1
-# delete similar groups:
 for x in range(0, len(similarity)):
         for y in range(0, len(similarity)):
                 if(similarity[x] == similarity[y] and x!=y):
                         similarity[x] = {0:"gleiche Gruppe: "+str(x)}
-
-#print(similarity)
-
-prompt_beginning = "Gib mir einen einzigen zusammenfassenden Titel aus, der für diese Probleme passt. Nicht mehr als einen Titel!"
-
+prompt_beginning = "Please provide a summary title and a detailed description that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length."
 
 for group in similarity:
         if(len(group)>1):
