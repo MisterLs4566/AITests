@@ -14,14 +14,14 @@ connection = sqlite3.connect("C:\\Users\\asolo\\OneDrive\\Dokumente\\Linus\\AITe
 
 cursor = connection.cursor()
 
-issues = [4, 7, 8]
+issues = [1, 2, 3]
 issue_hash_map = {}
 
 cursor.execute("CREATE TABLE IF NOT EXISTS issue(issue_id, issue_title, issue_description)")
 cursor.execute("""INSERT INTO issue VALUES
-        (4, "IMPORTANT PROBLEM", "Lieferscheine werden durch defektes Ticketing System nicht gedruckt"),
-        (7, "Probleme", "Katzen essen Hunde"),
-        (8, "ALSO AN IMPORTANT PROBLEM", "Scheine werden durch defektes Ticketing System nicht gedruckt")       
+        (1, "Issue1", "issue description 1"),
+        (2, "Issue2", "issue description 2),
+        (3, "Issue3", "issue description 3")       
         """)
 
 for issue in issues:
