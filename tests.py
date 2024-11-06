@@ -15,43 +15,43 @@ connection = sqlite3.connect("C:\\Users\\asolo\\OneDrive\\Dokumente\\Linus\\AITe
 cursor = connection.cursor()
 
 issues = [1, 2, 3]
-issue_hash_map = {}
+issue_dictionary = {}
 
 cursor.execute("CREATE TABLE IF NOT EXISTS issue(issue_id, issue_title, issue_description)")
 cursor.execute("""INSERT INTO issue VALUES
         (1, "Issue1", "issue description 1"),
-        (2, "Issue2", "issue description 2),
+        (2, "Issue2", "issue description 2"),
         (3, "Issue3", "issue description 3")       
         """)
 
 for issue in issues:
         description_projection = cursor.execute("SELECT issue_description FROM issue WHERE issue_id="+str(issue))
-        issue_hash_map[issue] = description_projection.fetchone()[0]
+        issue_dictionary[issue] = description_projection.fetchone()[0]
 
-vectors_hash_map = issue_hash_map.copy()
+vectors_dictionary = issue_dictionary.copy()
 
 i=-1
 
-for issue_text in list(issue_hash_map.values()):
+for issue_text in list(issue_dictionary.values()):
         i+=1
-        issue_key = list(issue_hash_map.keys())[i]
+        issue_key = list(issue_dictionary.keys())[i]
         result = genai.embed_content(
         model="models/text-embedding-004", content=issue_text)
         vector = np.array(result["embedding"])
-        vectors_hash_map[issue_key] = vector
+        vectors_dictionary[issue_key] = vector
 
 # Matrixvergleich
 similarity = []
-for x in range(0, len(list(vectors_hash_map.values()))):
-        for y in range(0, len(list(vectors_hash_map.values()))):
-                vector_a = list(vectors_hash_map.values())[x]
-                vector_b = list(vectors_hash_map.values())[y]
+for x in range(0, len(list(vectors_dictionary.values()))):
+        for y in range(0, len(list(vectors_dictionary.values()))):
+                vector_a = list(vectors_dictionary.values())[x]
+                vector_b = list(vectors_dictionary.values())[y]
                 cos_sim = round(dot(vector_a, vector_b) / (norm(vector_a) * norm(vector_b)), 9)
                 deg = (np.arccos(cos_sim)/np.pi) * 180
                 if(y==0):
-                        similarity.append({list(issue_hash_map.keys())[x] : list(issue_hash_map.values())[x]})
+                        similarity.append({list(issue_dictionary.keys())[x] : list(issue_dictionary.values())[x]})
                 if(deg < 25):
-                        similarity[x][list(issue_hash_map.keys())[y]] = list(issue_hash_map.values())[y]
+                        similarity[x][list(issue_dictionary.keys())[y]] = list(issue_dictionary.values())[y]
 
 result = []
 prompt_ending = ""
@@ -64,7 +64,7 @@ for x in range(0, len(similarity)):
         for y in range(0, len(similarity)):
                 if(similarity[x] == similarity[y] and x!=y):
                         similarity[x] = {0:"gleiche Gruppe: "+str(x)}
-prompt_beginning = "Please provide a summary title and a detailed description that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length: "
+prompt_beginning = "Please provide a summary title that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length: "
 
 for group in similarity:
         if(len(group)>1):
