@@ -53,9 +53,6 @@ for x in range(0, len(list(vectors_dictionary.values()))):
                 if(deg < 25):
                         similarity[x][list(issue_dictionary.keys())[y]] = list(issue_dictionary.values())[y]
 
-result = []
-prompt_ending = ""
-prompt = ""
 x = 0
 for group in similarity:
         similarity[x] = dict(sorted(group.items()))
@@ -64,6 +61,9 @@ for x in range(0, len(similarity)):
         for y in range(0, len(similarity)):
                 if(similarity[x] == similarity[y] and x!=y):
                         similarity[x] = {0:"gleiche Gruppe: "+str(x)}
+result = []
+prompt_ending = ""
+prompt = ""
 prompt_beginning = "Please provide a summary title that captures the essence of the related issues mentioned. The summary title should be approximately 50 characters long, and the description should be around 100-150 words in length: "
 
 for group in similarity:
